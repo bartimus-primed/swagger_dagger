@@ -2,7 +2,6 @@ import json
 import queue
 from urllib.request import urlopen
 from swag.swag_endpoint import SwagEndpoint
-from pprint import pprint
 from enum import Enum
 
 
@@ -50,11 +49,11 @@ class SwagManager:
                     self.paths = v
                     for path_name, path_value in v.items():
                         self.endpoints[path_name] = SwagEndpoint(
-                            path_name, path_value)
+                            path_value)
                     pass
                 case "definitions":
                     self.definitions = v
-                    self.parse_definitions("token")
+                    # self.parse_definitions("token")
                 case _:
                     pass
 
@@ -66,22 +65,3 @@ class SwagManager:
         if self.base_api[-1] == "/" and endpoint[0] == "/":
             return f"{self.desired_protocol}://{self.host}{endpoint}"
         return f"{self.desired_protocol}://{self.host}{self.base_api}{endpoint}"
-
-    def parse_swagger(self):
-        pass
-
-    def parse_tags(self):
-        pass
-
-    def parse_paths(self):
-        pass
-
-    def has(self, this, that):
-        this = this.lower()
-        that = that.lower()
-        return this.__contains__(that)
-
-    def exactly(self, this, that):
-        return this.lower() == that.lower()
-
-        # We need to search through the definitions and see if one exists for the argument's type name, if we find that we return it to ensure we fuzz the right data types
