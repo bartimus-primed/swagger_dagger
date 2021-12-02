@@ -9,7 +9,7 @@ class SwagTypes:
     def __init__(self, parameter_name):
         self.parameter_name = parameter_name
         """
-        We will generate the _described_type from the Descriptions endpoint
+        TODO: We will generate the _described_type from the Descriptions endpoint
         """
         self._described_type = None
 
