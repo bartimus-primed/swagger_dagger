@@ -49,7 +49,7 @@ class SwagManager:
                     self.paths = v
                     for path_name, path_value in v.items():
                         self.endpoints[path_name] = SwagEndpoint(
-                            path_value)
+                            path_value, self.make_endpoint(path_name))
                     pass
                 case "definitions":
                     self.definitions = v
