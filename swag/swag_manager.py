@@ -48,8 +48,8 @@ class SwagManager:
                 case "paths":
                     self.paths = v
                     for path_name, path_value in v.items():
-                        self.endpoints[path_name] = SwagEndpoint(
-                            path_value, self.make_endpoint(path_name))
+                        self.endpoints[path_name] = SwagEndpoint(self.host,
+                                                                 path_value, self.make_endpoint(path_name))
                     pass
                 case "definitions":
                     self.definitions = v
@@ -65,3 +65,13 @@ class SwagManager:
         if self.base_api[-1] == "/" and endpoint[0] == "/":
             return f"{self.desired_protocol}://{self.host}{endpoint}"
         return f"{self.desired_protocol}://{self.host}{self.base_api}{endpoint}"
+
+    def test_connections(self):
+        for endpoint_name, endpoint in self.endpoints.items():
+            endpoint.test_connections()
+
+    def check_successful(self):
+        for endpoint_name, endpoint in self.endpoints.items():
+            success = endpoint.check_successful()
+            if success is not None:
+                print(f"Endpoint: {endpoint_name}, response: {success}")

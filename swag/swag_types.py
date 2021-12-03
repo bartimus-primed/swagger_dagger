@@ -19,14 +19,19 @@ class SwagTypes:
         pass
 
 
-class SE_GET:
-    def __init__(self, raw_json, endpoint_addr):
-        self.endpoint_addr = endpoint_addr
+class SE_METHOD:
+    def __init__(self, host, method, raw_json, conn_type, endpoint_location):
+        self.host = host
+        self.method = method
+        self.conn_type = conn_type
+        self.endpoint_location = endpoint_location
         self.send_type = None
         self.parameters = None
         self.receive_type = None
         self.summary = None
         self.responses = {}
+        self.successful = False
+        self.successful_response = False
         self.build_data(raw_json)
 
     def build_data(self, details):
@@ -52,58 +57,27 @@ class SE_GET:
     def __str__(self):
         return self.toJson()
 
-    def test_connection(self):
-        if self.parameters is None and self.send_type is None:
-            print(self.endpoint_addr.split("/")[2])
-            connection = HTTPSConnection(self.endpoint_addr.split("/")[2])
-            req = connection.request("GET", self.endpoint_addr.split("/")[1:])
-            resp = req.getresponse()
-            if resp.status == "200":
-                print(json.dumps(resp.read()))
-            connection.close()
-
-
-class SE_POST:
-    def __init__(self, raw_json, endpoint_addr):
-        self.endpoint_addr = endpoint_addr
-        self.send_type = None
-        self.parameters = None
-        self.receive_type = None
-        self.summary = None
-        self.responses = {}
-        self.build_data(raw_json)
-
-    def build_data(self, details):
-        for k, v in details.items():
-            match(k):
-                case "consumes":
-                    self.send_type = v
-                case "parameters":
-                    self.parameters = v
-                case "produces":
-                    self.receive_type = v
-                case "summary":
-                    self.summary = v
-                case "responses":
-                    for sub_k, sub_v in v.items():
-                        if sub_v["description"] is not None:
-                            self.responses[sub_k] = SE_RESPONSE(
-                                sub_k, sub_v["description"])
-
-    def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=2)
-
-    def __str__(self):
-        return self.toJson()
-
-    def test_connection(self):
-        if self.parameters is None and self.send_type is None:
-            connection = HTTPSConnection(self.endpoint_addr.split("/")[2])
-            print(self.endpoint_addr.split("/")[1:])
-            req = connection.request("POST", self.endpoint_addr.split("/")[1:])
-            resp = req.getresponse()
-            if resp.status == "200":
-                print(json.dumps(resp.read()))
+    def test_endpoint_connection(self):
+        connection = None
+        match(self.conn_type.lower()):
+            case "http":
+                connection = HTTPConnection(self.host, timeout=1)
+            case "https":
+                connection = HTTPSConnection(self.host, timeout=1)
+            case _:
+                print("unsupported method. (for right now)")
+                return
+        if connection is not None:
+            connection.request(
+                self.method, self.endpoint_location)
+            resp = connection.getresponse()
+            if str(resp.status) == "200":
+                self.successful = True
+                try:
+                    self.successful_response = json.loads(
+                        resp.read().decode("utf8").replace("'", '"'))
+                except:
+                    self.successful_response = resp.read().decode("utf8")
             connection.close()
 
 
