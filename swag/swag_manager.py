@@ -3,6 +3,9 @@ import queue
 from urllib.request import urlopen
 from swag.swag_endpoint import SwagEndpoint
 from enum import Enum
+from http.client import HTTPConnection, HTTPSConnection
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 
 class RESULT(Enum):
@@ -24,16 +27,38 @@ class SwagManager:
         self.definitions = None
         self.endpoints = {}
         self.endpoint = endpoint
-        self.desired_protocol = self.endpoint.split("://")[0]
+        self.desired_protocol = self.endpoint.split("://")[0].lower()
         self.get_swag_endpoint_data()
         self.parse_swagger_json()
 
     # Read the json endpoint. I need to add a brute force checker for common locations.
     def get_swag_endpoint_data(self):
-        with urlopen(self.endpoint, timeout=3) as swag_conn:
-            self.endpoint_data = json.load(swag_conn)
+        try:
+            with urlopen(self.endpoint, timeout=3) as swag_conn:
+                self.endpoint_data = json.load(swag_conn)
+        except:
+            # This is incase just the web platform is given
+            # TODO: need to make this work better. Probably need to scrape the page to get the js file that loads the endpoint data.
+            # Populate all the SwagManager Properties that will be needed to attack
+            connection = None
+            url = self.endpoint.split("://")[1].lower().split("/")[0]
+            connection_point = "/" + \
+                "/".join(self.endpoint.split(":")[2].split("/")[1:])
+            match(self.desired_protocol):
+                case "http":
+                    connection = HTTPConnection(url, timeout=1)
+                case "https":
+                    connection = HTTPSConnection(url, timeout=1)
+                case _:
+                    exit("Did you forget to put http/https?")
+            connection.request("GET", connection_point, encode_chunked=True,
+                               headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.34"})
+            resp = connection.getresponse()
+            print(resp.read())
+            print(resp.geturl())
+            if str(resp.status) == "200":
+                print(resp.read().decode("utf8"))
 
-    # Populate all the SwagManager Properties that will be needed to attack
     def parse_swagger_json(self):
         for k, v in self.endpoint_data.items():
             match(k):
