@@ -5,7 +5,9 @@ Swag types is broken off so there is an easier way to fuzz the parameters. We ca
 If someone wants to write special fuzz cases or anything, they can essentially add them as a class and add that to a swag_endpoint's methods list
 """
 
-
+"""
+Currently just a placeholder class, until I can integrate it.
+"""
 class SwagTypes:
     def __init__(self, parameter_name, parameter_type):
         self.parameter_name = parameter_name
