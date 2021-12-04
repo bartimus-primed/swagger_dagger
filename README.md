@@ -16,8 +16,8 @@ Work In Progress
 ---
 #### Workflow is something like this
 
-Step 1. Ingest the swagger json API (done)
-Step 2. Identify API http methods (done)
-Step 3. Identify API http parameters (done)
-Step 4. Interact with the APIs to identify which do not require authentication (done)
-Step 5. Fuzz the available parameters (in progress)
+1. Ingest the swagger json API (done)
+2. Identify API http methods (done)
+3. Identify API http parameters (done)
+4. Interact with the APIs to identify which do not require authentication (done)
+5. Fuzz the available parameters (in progress)
