@@ -1,3 +1,4 @@
+[]("./s_d_logo.svg")
 # Swagger Dagger
 ### Automate API Security Testing
 ##### Swagger is used to help expose your API to developers. 
