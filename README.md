@@ -1,6 +1,7 @@
-[]("./s_d_logo.svg")
-# Swagger Dagger
+---
+# Swagger Dagger <img src=s_d_logo.svg width=300 align=left>
 ### Automate API Security Testing
+---
 ##### Swagger is used to help expose your API to developers. 
 ##### Swagger Dagger is used to check if your API exposes you.
 ###### Project Status: Infancy (started 11/29/2021)
