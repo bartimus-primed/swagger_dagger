@@ -14,4 +14,4 @@ class BooleanManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "BOOLEAN RULES"
+        return "BOOLEANRULE"

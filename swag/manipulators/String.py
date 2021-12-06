@@ -14,4 +14,4 @@ class StringManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "STRING RULES"
+        return "STRINGRULE"

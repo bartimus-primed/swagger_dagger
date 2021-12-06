@@ -1,5 +1,6 @@
 import json
 from http.client import HTTPConnection, HTTPSConnection
+from re import split
 from swag.manipulators import *
 from swag.manipulators.Default import DefaultManipulator
 
@@ -18,6 +19,7 @@ class SE_METHOD:
         self.method = method
         self.conn_type = conn_type
         self.endpoint_location = endpoint_location
+        self.fuzzed_endpoint_location = None
         self.send_type = None
         self.parameters = None
         self.all_parameters = []
@@ -79,6 +81,37 @@ class SE_METHOD:
                     self.successful_response = resp.read().decode("utf8")
             connection.close()
 
+    def generate_parameter_url(self):
+        generation_path = self.endpoint_location
+        for param in self.all_parameters:
+            match(param.location):
+                # At the end of the current url host.com/path/to?param=""
+                case "query":
+                    param_generation = "PARAM_VALUE"
+                    for gen in param.manipulators:
+                        param_generation = gen.generate()
+                    if "?" not in generation_path:
+                        param_query = f"?{param.name}={param_generation}"
+                    else:
+                        param_query = f"&{param.name}={param_generation}"
+                    generation_path += param_query
+                    self.fuzzed_endpoint_location = generation_path
+                # Needs to be added to request body
+                case "body":
+                    pass
+                # needs to be replaced in the path host.com/REPLACED/path/to
+                case "path":
+                    if param.name in generation_path:
+                        param_generation = "NEW_VALUE"
+                        for gen in param.manipulators:
+                            param_generation = gen.generate()
+                        replacer = "{" + param.name + "}"
+                        generation_path = generation_path.replace(
+                            replacer, param_generation)
+                    self.fuzzed_endpoint_location = generation_path
+        if self.debug:
+            print(self.fuzzed_endpoint_location)
+
     def parse_parameter_data(self):
         if self.parameters is not None:
             for parameter in self.parameters:
@@ -126,7 +159,7 @@ class SE_PARAMETER:
             match(d):
                 case "name":
                     self.name = data["name"]
-                case "location":
+                case "in":
                     self.location = data["in"]
                 case "description":
                     self.description = data["description"]
