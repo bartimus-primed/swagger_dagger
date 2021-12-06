@@ -13,13 +13,14 @@ on individual SE_METHODs.
 
 
 class SE_METHOD:
-    def __init__(self, host, method, raw_json, conn_type, endpoint_location):
+    def __init__(self, host, method, raw_json, conn_type, endpoint_location, debug=False):
         self.host = host
         self.method = method
         self.conn_type = conn_type
         self.endpoint_location = endpoint_location
         self.send_type = None
         self.parameters = None
+        self.all_parameters = []
         self.optional_parameters = []
         self.required_parameters = []
         self.receive_type = None
@@ -27,6 +28,7 @@ class SE_METHOD:
         self.responses = {}
         self.successful = False
         self.successful_response = False
+        self.debug = debug
         self.build_data(raw_json)
 
     def build_data(self, details):
@@ -61,7 +63,8 @@ class SE_METHOD:
             case "https":
                 connection = HTTPSConnection(self.host, timeout=1)
             case _:
-                print("unsupported method. (for right now)")
+                if self.debug:
+                    print("unsupported method. (for right now)")
                 return
         if connection is not None:
             connection.request(
@@ -84,6 +87,8 @@ class SE_METHOD:
                     self.required_parameters.append(param)
                 else:
                     self.optional_parameters.append(param)
+            self.all_parameters += self.required_parameters
+            self.all_parameters += self.optional_parameters
 
     def add_manipulator(self, new_manipulator):
         self.manipulators.append(new_manipulator)
@@ -107,7 +112,7 @@ class SE_RESPONSE:
 
 class SE_PARAMETER:
 
-    def __init__(self, data):
+    def __init__(self, data, debug=False):
         self.name = None
         self.location = None
         self.description = None
@@ -115,6 +120,7 @@ class SE_PARAMETER:
         self.default = None
         self.format = None
         self.type_of = None
+        self.debug = debug
         self.manipulators = []
         for d in data.keys():
             match(d):
@@ -157,8 +163,10 @@ class SE_PARAMETER:
                 self.manipulators.append(
                     ArrayManipulator(self.name, self.type_of, self.default))
             case _:
-                print(
-                    f"No Manipulator implemented for {self.type_of}, assigning default")
-                if self.default:
+                if self.default is not None:
+                    if self.debug:
+                        print(f"No Manipulator implemented for {self.type_of}")
+                        print(
+                            "Identified default value assigning default manipulator")
                     self.manipulators.append(DefaultManipulator(
                         self.name, self.type_of, self.default))

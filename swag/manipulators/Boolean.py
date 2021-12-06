@@ -9,6 +9,8 @@ class BooleanManipulator(SwagManipulator):
         super().__init__(self.parameter_name, self.parameter_type, self.default_value)
 
     def generate(self):
+        if self.default_value:
+            print(self.default_value)
         return self.get_rules()
 
     def get_rules(self):

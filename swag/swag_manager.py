@@ -27,7 +27,7 @@ Returns:
 
 
 class SwagManager:
-    def __init__(self, endpoint):
+    def __init__(self, endpoint, debug=False):
         self._parse_queue = queue.Queue()
         self.endpoint_data = None
         self.base_api = None
@@ -41,6 +41,7 @@ class SwagManager:
         self.endpoints = {}
         self.endpoint = endpoint
         self.desired_protocol = self.endpoint.split("://")[0].lower()
+        self.debug = debug
         self.get_swag_endpoint_data()
         self.parse_swagger_json()
 
@@ -87,7 +88,7 @@ class SwagManager:
                     self.paths = v
                     for path_name, path_value in v.items():
                         self.endpoints[path_name] = SwagEndpoint(self.host,
-                                                                 path_value, self.make_endpoint(path_name))
+                                                                 path_value, self.make_endpoint(path_name), self.debug)
                 case "definitions":
                     self.definitions = v
                     # self.parse_definitions("token")
@@ -107,11 +108,11 @@ class SwagManager:
         for endpoint_name, endpoint in self.endpoints.items():
             endpoint.test_connections()
 
-    def detect_open_endpoints(self, show_output=False):
+    def detect_open_endpoints(self):
         for endpoint_name, endpoint in self.endpoints.items():
             success = endpoint.check_successful()
             if success:
-                if show_output:
+                if self.debug:
                     print(
                         f"Endpoint: {endpoint_name} seems to be open\n\tresponse: {success}")
                 self.open_endpoints.append(endpoint)

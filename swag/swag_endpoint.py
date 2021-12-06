@@ -15,22 +15,23 @@ import json
 
 
 class SwagEndpoint:
-    def __init__(self, host, raw_json, endpoint_addr):
+    def __init__(self, host, raw_json, endpoint_addr, debug=False):
         self.host = host
         self.conn_type = endpoint_addr.split("://")[0]
         self.endpoint_location = "/" + "/".join(endpoint_addr.split("/")[3:])
         self.endpoint_get = None
         self.endpoint_post = None
         self.methods = []
+        self.debug = debug
         for k, v in raw_json.items():
             match(k):
                 case "get":
                     self.endpoint_get = SE_METHOD(
-                        self.host, "GET", v, self.conn_type, self.endpoint_location)
+                        self.host, "GET", v, self.conn_type, self.endpoint_location, self.debug)
                     self.methods.append(self.endpoint_get)
                 case "post":
                     self.endpoint_post = SE_METHOD(
-                        self.host, "POST", v, self.conn_type, self.endpoint_location)
+                        self.host, "POST", v, self.conn_type, self.endpoint_location, self.debug)
                     self.methods.append(self.endpoint_post)
 
     def toJson(self):
@@ -46,7 +47,8 @@ class SwagEndpoint:
     def get_parameters(self):
         for method in self.methods:
             if method.parameters is not None:
-                print(method.parameters)
+                if self.debug:
+                    print(method.parameters)
 
     def check_successful(self):
         for method in self.methods:
@@ -55,9 +57,4 @@ class SwagEndpoint:
 
     def print_open_methods(self, only_show_parameters=False):
         for method in self.methods:
-            if only_show_parameters:
-                if method.parameters:
-                    for entry in method.parameters:
-                        print(entry)
-        else:
-            print(self)
+            print(method)
