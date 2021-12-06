@@ -3,20 +3,14 @@ from swag.swag_manager import SwagManager
 
 
 def main(swagger_endpoint):
-    swag_api = SwagManager(swagger_endpoint, debug=True)
+    swag_api = SwagManager(swagger_endpoint)
     swag_api.test_connections()
     swag_api.detect_open_endpoints()
     for _e in swag_api.endpoints:
         for meth in swag_api.endpoints[_e].methods:
             meth.generate_parameter_url()
-    #         for req_p in meth.required_parameters:
-    #             for manipulator in req_p.manipulators:
-    #                 if manipulator.default_value is not None:
-    #                     print(manipulator)
-    #         for opt_p in meth.optional_parameters:
-    #             for manipulator in opt_p.manipulators:
-    #                 if manipulator.default_value is not None:
-    #                     print(manipulator)
+            if meth.fuzzed_endpoint_location is not None:
+                meth.test_fuzzed_endpoint_connection(print_response=True)
 
 
 if __name__ == "__main__":

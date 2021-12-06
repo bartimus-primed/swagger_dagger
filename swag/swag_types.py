@@ -81,6 +81,36 @@ class SE_METHOD:
                     self.successful_response = resp.read().decode("utf8")
             connection.close()
 
+    def test_fuzzed_endpoint_connection(self, print_response=False):
+        if print_response:
+            print(
+                f"Fuzzing {self.endpoint_location} with these parameters: {self.fuzzed_endpoint_location}")
+        connection = None
+        match(self.conn_type.lower()):
+            case "http":
+                connection = HTTPConnection(self.host, timeout=1)
+            case "https":
+                connection = HTTPSConnection(self.host, timeout=1)
+            case _:
+                if self.debug:
+                    print("unsupported method. (for right now)")
+                return
+        if connection is not None:
+            connection.request(
+                self.method, self.fuzzed_endpoint_location)
+            resp = connection.getresponse()
+            match(str(resp.status)):
+                case "200":
+                    self.successful = True
+                    try:
+                        self.successful_response = json.loads(
+                            resp.read().decode("utf8").replace("'", '"'))
+                    except:
+                        self.successful_response = resp.read().decode("utf8")
+                case "500":
+                    print("ERROR from server")
+            connection.close()
+
     def generate_parameter_url(self):
         generation_path = self.endpoint_location
         for param in self.all_parameters:
