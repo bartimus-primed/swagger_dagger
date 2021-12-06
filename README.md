@@ -10,8 +10,8 @@
     Python 3.10 or newer (Due to using the match statement introduced in 3.10, attempting to use this in versions <3.10 will likely fail)
 
 #### Background
-I accepted a new job and wanted to make sure that I didn't leave my current team in the dark. My last project needed to test a couple hundred API endpoints for Access Permissions.
-After spending a few hours looking through the source code and gathering the parameters for each endpoint. I realized this was going to take too long. 
+My last project needed to test a couple hundred API endpoints for Access Permissions.
+After spending a few hours looking through the source code and gathering the parameters for each endpoint, I realized this was going to take too long. 
 I found a Swagger json endpoint (awesome tool for devs, even more awesome for security researchers :D).
 
 Swagger Dagger was born.
