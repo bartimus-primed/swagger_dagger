@@ -15,4 +15,4 @@ class DefaultManipulator(SwagManipulator):
         return self.default_value
 
     def get_rules(self):
-        return "DEFAULT RULES"
+        return "DEFAULTRULE"
