@@ -7,7 +7,8 @@
 ###### Project Status: Infancy (started 11/29/2021)
 ---
 #### Requirements
-    Python 3.10 or newer (Due to using the match statement introduced in 3.10, attempting to use this in versions <3.10 will likely fail)
+    Python 3.10 or newer
+    Due to using the match statement introduced in 3.10, attempting to use this in versions <3.10 will likely fail
 
 #### Background
 My last project needed to test a couple hundred API endpoints for Access Permissions.
