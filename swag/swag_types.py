@@ -1,24 +1,14 @@
 import json
 from http.client import HTTPConnection, HTTPSConnection
-"""
-Swag types is broken off so there is an easier way to fuzz the parameters. We can do all the checks inside here as well as generate new outputs.
-If someone wants to write special fuzz cases or anything, they can essentially add them as a class and add that to a swag_endpoint's methods list
-"""
+from swag.manipulators import *
 
 """
-Currently just a placeholder class, until I can integrate it.
+Swag types is broken off so there is an easier way to interact with each API method.
+We can do all the checks inside here as well as generate new outputs.
+The SwagEndpoint and SwagManager eventually call the SE_METHOD (short for SwaggerEndpoint_Method) class.
+In essence SwagEndpoint and SwagManagers are simply batch managers which allow multiple things to happen
+on individual SE_METHODs.
 """
-class SwagTypes:
-    def __init__(self, parameter_name, parameter_type):
-        self.parameter_name = parameter_name
-        """
-        TODO: We will generate the _described_type from the Descriptions endpoint
-        """
-        self._described_type = parameter_type
-
-    def generate_fuzz(self):
-        # Create the fuzzy stuffing
-        pass
 
 
 class SE_METHOD:
@@ -29,6 +19,8 @@ class SE_METHOD:
         self.endpoint_location = endpoint_location
         self.send_type = None
         self.parameters = None
+        self.optional_parameters = []
+        self.required_parameters = []
         self.receive_type = None
         self.summary = None
         self.responses = {}
@@ -43,6 +35,7 @@ class SE_METHOD:
                     self.send_type = v
                 case "parameters":
                     self.parameters = v
+                    self.parse_parameter_data()
                 case "produces":
                     self.receive_type = v
                 case "summary":
@@ -82,6 +75,22 @@ class SE_METHOD:
                     self.successful_response = resp.read().decode("utf8")
             connection.close()
 
+    def parse_parameter_data(self):
+        if self.parameters is not None:
+            for parameter in self.parameters:
+                param = SE_PARAMETER(parameter)
+                if param.required:
+                    self.required_parameters.append(param)
+                else:
+                    self.optional_parameters.append(param)
+
+    def add_manipulator(self, new_manipulator):
+        self.manipulators.append(new_manipulator)
+
+    def run_manipulators(self):
+        for mani in self.manipulators:
+            mani.generate()
+
 
 class SE_RESPONSE:
     def __init__(self, code, description):
@@ -93,3 +102,65 @@ class SE_RESPONSE:
 
     def __str__(self):
         return self.toJson()
+
+
+class SE_PARAMETER:
+
+    def __init__(self, data):
+        self.name = None
+        self.location = None
+        self.description = None
+        self.required = None
+        self.default = None
+        self.format = None
+        self.type_of = None
+        self.manipulators = []
+        for d in data.keys():
+            match(d):
+                case "name":
+                    self.name = data["name"]
+                case "location":
+                    self.location = data["in"]
+                case "description":
+                    self.description = data["description"]
+                case "required":
+                    self.required = data["required"]
+                case "default":
+                    self.default = data["default"]
+                case "format":
+                    self.format = data["format"]
+                case "type":
+                    self.type_of = data["type"].lower()
+        self.assign_default_manipulator()
+
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=2)
+
+    def __str__(self):
+        return self.toJson()
+
+    def assign_default_manipulator(self):
+        if self.type_of is None:
+            return
+        match(self.type_of):
+            case "string":
+                self.manipulators.append(
+                    StringManipulator(self.name, self.type_of, self.default))
+            case "integer":
+                self.manipulators.append(
+                    IntegerManipulator(self.name, self.type_of, self.default))
+            case "number":
+                pass
+            case "boolean":
+                self.manipulators.append(
+                    BooleanManipulator(self.name, self.type_of, self.default))
+            case "array":
+                self.manipulators.append(
+                    ArrayManipulator(self.name, self.type_of, self.default))
+            case "file":
+                pass
+            case "object":
+                pass
+            case _:
+                print(f"No Manipulator defined for {self.type_of}")
+                print(f"You can write on and upload it to the github")

@@ -2,7 +2,12 @@ from swag.swag_types import SE_METHOD
 import json
 
 """
-    The swag endpoint keeps track of the valid methods
+    The swag endpoint keeps track of the valid SE_METHODS. A Single endpoint can have multiple
+    SE_METHODS, though I think it's better to only have one for each http method that is supported.
+    e.g.
+    PUT -> SE_METHOD
+    GET -> SE_METHOD
+    POST -> SE_METHOD
 
     Returns:
         SwagEndpoint: An object that allows you to test connection, attack, or fuzz
@@ -38,7 +43,21 @@ class SwagEndpoint:
         for method in self.methods:
             method.test_endpoint_connection()
 
+    def get_parameters(self):
+        for method in self.methods:
+            if method.parameters is not None:
+                print(method.parameters)
+
     def check_successful(self):
         for method in self.methods:
             if method.successful:
                 return method.successful_response
+
+    def print_open_methods(self, only_show_parameters=False):
+        for method in self.methods:
+            if only_show_parameters:
+                if method.parameters:
+                    for entry in method.parameters:
+                        print(entry)
+        else:
+            print(self)

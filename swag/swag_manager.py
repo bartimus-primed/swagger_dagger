@@ -14,6 +14,18 @@ class RESULT(Enum):
     MAYBE = 2,
 
 
+"""
+
+SwagManager is the top level class to allow easy interaction with an entire website.
+SwagManager should contain multiple SwagEndpoints associated with the site.
+If you only have a single endpoint you are testing then creating a SwagEndpoint by iteself is more efficient.
+
+
+Returns:
+    SwagManager: Allows easy managing of entire site with multiple endpoints.
+"""
+
+
 class SwagManager:
     def __init__(self, endpoint):
         self._parse_queue = queue.Queue()
@@ -25,6 +37,7 @@ class SwagManager:
         self.tags = None
         self.paths = None
         self.definitions = None
+        self.open_endpoints = []
         self.endpoints = {}
         self.endpoint = endpoint
         self.desired_protocol = self.endpoint.split("://")[0].lower()
@@ -75,7 +88,6 @@ class SwagManager:
                     for path_name, path_value in v.items():
                         self.endpoints[path_name] = SwagEndpoint(self.host,
                                                                  path_value, self.make_endpoint(path_name))
-                    pass
                 case "definitions":
                     self.definitions = v
                     # self.parse_definitions("token")
@@ -95,8 +107,21 @@ class SwagManager:
         for endpoint_name, endpoint in self.endpoints.items():
             endpoint.test_connections()
 
-    def check_successful(self):
+    def detect_open_endpoints(self, show_output=False):
         for endpoint_name, endpoint in self.endpoints.items():
             success = endpoint.check_successful()
-            if success is not None:
-                print(f"Endpoint: {endpoint_name}, response: {success}")
+            if success:
+                if show_output:
+                    print(
+                        f"Endpoint: {endpoint_name} seems to be open\n\tresponse: {success}")
+                self.open_endpoints.append(endpoint)
+
+    def print_open_endpoints(self, only_show_parameters=False):
+        for endpoint in self.open_endpoints:
+            if only_show_parameters:
+                for method in endpoint.methods:
+                    if method.parameters:
+                        for entry in method.parameters:
+                            print(entry)
+            else:
+                print(endpoint)
