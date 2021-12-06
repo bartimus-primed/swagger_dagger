@@ -7,17 +7,18 @@ def main(swagger_endpoint):
     swag_api.test_connections()
     swag_api.detect_open_endpoints()
     # swag_api.print_open_endpoints(only_show_parameters=True)
-    print(len(swag_api.open_endpoints))
-    for _e in swag_api.endpoints:
-        for meth in swag_api.endpoints[_e].methods:
-            for req_p in meth.required_parameters:
-                for manipulator in req_p.manipulators:
-                    if manipulator.default_value is not None:
-                        print(manipulator)
-            for opt_p in meth.optional_parameters:
-                for manipulator in opt_p.manipulators:
-                    if manipulator.default_value is not None:
-                        print(manipulator)
+    for e in swag_api.open_endpoints:
+        print(e.endpoint_location)
+    # for _e in swag_api.endpoints:
+    #     for meth in swag_api.endpoints[_e].methods:
+    #         for req_p in meth.required_parameters:
+    #             for manipulator in req_p.manipulators:
+    #                 if manipulator.default_value is not None:
+    #                     print(manipulator)
+    #         for opt_p in meth.optional_parameters:
+    #             for manipulator in opt_p.manipulators:
+    #                 if manipulator.default_value is not None:
+    #                     print(manipulator)
 
 
 if __name__ == "__main__":

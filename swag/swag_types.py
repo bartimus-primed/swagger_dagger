@@ -1,6 +1,7 @@
 import json
 from http.client import HTTPConnection, HTTPSConnection
 from swag.manipulators import *
+from swag.manipulators.Default import DefaultManipulator
 
 """
 Swag types is broken off so there is an easier way to interact with each API method.
@@ -149,18 +150,15 @@ class SE_PARAMETER:
             case "integer":
                 self.manipulators.append(
                     IntegerManipulator(self.name, self.type_of, self.default))
-            case "number":
-                pass
             case "boolean":
                 self.manipulators.append(
                     BooleanManipulator(self.name, self.type_of, self.default))
             case "array":
                 self.manipulators.append(
                     ArrayManipulator(self.name, self.type_of, self.default))
-            case "file":
-                pass
-            case "object":
-                pass
             case _:
-                print(f"No Manipulator defined for {self.type_of}")
-                print(f"You can write on and upload it to the github")
+                print(
+                    f"No Manipulator implemented for {self.type_of}, assigning default")
+                if self.default:
+                    self.manipulators.append(DefaultManipulator(
+                        self.name, self.type_of, self.default))
