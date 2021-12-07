@@ -20,4 +20,4 @@ class IntegerManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "INTEGERRULE"
+        return "-1"

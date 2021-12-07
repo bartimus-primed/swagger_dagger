@@ -8,9 +8,12 @@ def main(swagger_endpoint):
     swag_api.detect_open_endpoints()
     for _e in swag_api.endpoints:
         for meth in swag_api.endpoints[_e].methods:
-            meth.generate_parameter_url()
+            if meth.all_parameters:
+                meth.generate_parameter_url()
             if meth.fuzzed_endpoint_location is not None:
                 meth.test_fuzzed_endpoint_connection(print_response=True)
+                if meth.successful_response:
+                    print(meth.successful_response)
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ from swag.swag_manipulator import SwagManipulator
 
 
 class BooleanManipulator(SwagManipulator):
-    def __init__(self, parameter_name, parameter_type, parameter_location, default_value=None):
+    def __init__(self, parameter_name, parameter_type, parameter_location, default_value="true"):
         self.parameter_name = parameter_name
         self.parameter_type = parameter_type
         self.default_value = default_value
@@ -20,4 +20,4 @@ class BooleanManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "BOOLEANRULE"
+        return "true"

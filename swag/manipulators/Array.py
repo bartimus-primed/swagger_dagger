@@ -20,4 +20,4 @@ class ArrayManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "ARRAYRULE"
+        return "[0,'a',true]"

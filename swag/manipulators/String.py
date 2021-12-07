@@ -20,4 +20,4 @@ class StringManipulator(SwagManipulator):
         return self.get_rules()
 
     def get_rules(self):
-        return "STRINGRULE"
+        return "FUZZSTRING"
