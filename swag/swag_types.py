@@ -114,31 +114,9 @@ class SE_METHOD:
     def generate_parameter_url(self):
         generation_path = self.endpoint_location
         for param in self.all_parameters:
-            match(param.location):
-                # At the end of the current url host.com/path/to?param=""
-                case "query":
-                    param_generation = "PARAM_VALUE"
-                    for gen in param.manipulators:
-                        param_generation = gen.generate()
-                    if "?" not in generation_path:
-                        param_query = f"?{param.name}={param_generation}"
-                    else:
-                        param_query = f"&{param.name}={param_generation}"
-                    generation_path += param_query
-                    self.fuzzed_endpoint_location = generation_path
-                # Needs to be added to request body
-                case "body":
-                    pass
-                # needs to be replaced in the path host.com/REPLACED/path/to
-                case "path":
-                    if param.name in generation_path:
-                        param_generation = "NEW_VALUE"
-                        for gen in param.manipulators:
-                            param_generation = gen.generate()
-                        replacer = "{" + param.name + "}"
-                        generation_path = generation_path.replace(
-                            replacer, param_generation)
-                    self.fuzzed_endpoint_location = generation_path
+            if param.manipulator is not None:
+                self.fuzzed_endpoint_location = param.manipulator.replace_parameter(
+                    generation_path)
         if self.debug:
             print(self.fuzzed_endpoint_location)
 
@@ -184,7 +162,7 @@ class SE_PARAMETER:
         self.format = None
         self.type_of = None
         self.debug = debug
-        self.manipulators = []
+        self.manipulator = None
         for d in data.keys():
             match(d):
                 case "name":
@@ -214,22 +192,22 @@ class SE_PARAMETER:
             return
         match(self.type_of):
             case "string":
-                self.manipulators.append(
-                    StringManipulator(self.name, self.type_of, self.default))
+                self.manipulator = StringManipulator(
+                    self.name, self.type_of, self.location, self.default)
             case "integer":
-                self.manipulators.append(
-                    IntegerManipulator(self.name, self.type_of, self.default))
+                self.manipulator = IntegerManipulator(
+                    self.name, self.type_of, self.location, self.default)
             case "boolean":
-                self.manipulators.append(
-                    BooleanManipulator(self.name, self.type_of, self.default))
+                self.manipulator = BooleanManipulator(
+                    self.name, self.type_of, self.location, self.default)
             case "array":
-                self.manipulators.append(
-                    ArrayManipulator(self.name, self.type_of, self.default))
+                self.manipulator = ArrayManipulator(
+                    self.name, self.type_of, self.location, self.default)
             case _:
                 if self.default is not None:
                     if self.debug:
                         print(f"No Manipulator implemented for {self.type_of}")
                         print(
                             "Identified default value assigning default manipulator")
-                    self.manipulators.append(DefaultManipulator(
-                        self.name, self.type_of, self.default))
+                    self.manipulator = DefaultManipulator(
+                        self.name, self.type_of, self.location, self.default)

@@ -8,12 +8,6 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-class RESULT(Enum):
-    NO = 0
-    YES = 1,
-    MAYBE = 2,
-
-
 """
 
 SwagManager is the top level class to allow easy interaction with an entire website.
