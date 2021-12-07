@@ -24,15 +24,9 @@ class SwagEndpoint:
         self.methods = []
         self.debug = debug
         for k, v in raw_json.items():
-            match(k):
-                case "get":
-                    self.endpoint_get = SE_METHOD(
-                        self.host, "GET", v, self.conn_type, self.endpoint_location, self.debug)
-                    self.methods.append(self.endpoint_get)
-                case "post":
-                    self.endpoint_post = SE_METHOD(
-                        self.host, "POST", v, self.conn_type, self.endpoint_location, self.debug)
-                    self.methods.append(self.endpoint_post)
+            self.endpoint_post = SE_METHOD(
+                self.host, k.upper(), v, self.conn_type, self.endpoint_location, self.debug)
+            self.methods.append(self.endpoint_post)
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, indent=2)

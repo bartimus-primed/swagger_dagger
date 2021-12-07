@@ -1,6 +1,5 @@
 import json
 from http.client import HTTPConnection, HTTPSConnection
-from re import split
 from swag.manipulators import *
 from swag.manipulators.Default import DefaultManipulator
 
@@ -84,7 +83,7 @@ class SE_METHOD:
     def test_fuzzed_endpoint_connection(self, print_response=False):
         if print_response:
             print(
-                f"Fuzzing {self.endpoint_location} with these parameters: {self.fuzzed_endpoint_location}")
+                f"Fuzzing {self.method} request {self.endpoint_location} with these parameters: {self.fuzzed_endpoint_location}")
         connection = None
         match(self.conn_type.lower()):
             case "http":
@@ -112,11 +111,11 @@ class SE_METHOD:
             connection.close()
 
     def generate_parameter_url(self):
-        generation_path = self.endpoint_location
+        self.fuzzed_endpoint_location = self.endpoint_location
         for param in self.all_parameters:
             if param.manipulator is not None:
                 self.fuzzed_endpoint_location = param.manipulator.replace_parameter(
-                    generation_path)
+                    self.fuzzed_endpoint_location)
         if self.debug:
             print(self.fuzzed_endpoint_location)
 
@@ -189,7 +188,7 @@ class SE_PARAMETER:
 
     def assign_default_manipulator(self):
         if self.type_of is None:
-            return
+            self.type_of = "null"
         match(self.type_of):
             case "string":
                 self.manipulator = StringManipulator(
@@ -204,10 +203,12 @@ class SE_PARAMETER:
                 self.manipulator = ArrayManipulator(
                     self.name, self.type_of, self.location, self.default)
             case _:
+                if self.debug:
+                    print(f"No Manipulator implemented for {self.type_of}")
+                    print("Identified default value assigning default manipulator")
                 if self.default is not None:
-                    if self.debug:
-                        print(f"No Manipulator implemented for {self.type_of}")
-                        print(
-                            "Identified default value assigning default manipulator")
                     self.manipulator = DefaultManipulator(
                         self.name, self.type_of, self.location, self.default)
+                else:
+                    self.manipulator = NullManipulator(
+                        self.name, self.type_of, self.location)

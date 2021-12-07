@@ -1,5 +1,6 @@
-from abc import ABC, abstractclassmethod, abstractmethod
+from abc import ABC, abstractclassmethod
 import json
+import re
 """
     Swag Manipulator's allow a SE_METHOD to fuzz it's parameters. Essentially you can assign maniplulators
     to the SE_METHOD and then call SE_METHOD.fuzz() which will generator a manipulation of the parameters
@@ -9,14 +10,13 @@ import json
     2. permutate
 """
 
+URL_PARAMETER = re.compile('{(.*?)}')
+
 
 class SwagManipulator(ABC):
 
-    def __init__(self, parameter_name, parameter_type, parameter_location, default_value=None):
-        self.parameter_name = parameter_name
-        self.parameter_type = parameter_type
-        self.parameter_location = parameter_location
-        self.default_value = default_value
+    def __init__(self):
+        self.PATH_REPLACEMENT = "{" + self.parameter_name + "}"
         self.parameter_queue = []
 
     @abstractclassmethod
@@ -31,23 +31,18 @@ class SwagManipulator(ABC):
         self.parameter_queue.append(parameter)
 
     def get_from_queue(self):
-        value = self.default_value
         if len(self.parameter_queue) > 0:
-            value = self.parameter_queue.pop()
-        return value
+            return self.parameter_queue.pop()
+        return self.default_value
 
     def replace_parameter(self, url_string):
-        replacement = "{" + self.parameter_name + "}"
-        if self.parameter_location == "path":
-            if self.parameter_name in url_string:
-                url_string = url_string.replace(
-                    replacement, self.get_from_queue())
-        elif self.parameter_location == "query":
+        if url_string.__contains__(self.PATH_REPLACEMENT):
+            return url_string.replace(self.PATH_REPLACEMENT, self.get_from_queue())
+        if self.parameter_location == "query":
             if "?" not in url_string:
-                param_query = f"?{self.parameter_name}={self.get_from_queue()}"
+                return f"{url_string}?{self.parameter_name}={self.get_from_queue()}"
             else:
-                param_query = f"&{self.parameter_name}={self.get_from_queue()}"
-            url_string += param_query
+                return f"{url_string}&{self.parameter_name}={self.get_from_queue()}"
         return url_string
 
     def toJson(self):

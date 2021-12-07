@@ -1,11 +1,11 @@
 from swag.swag_manipulator import SwagManipulator
 
 
-class StringManipulator(SwagManipulator):
-    def __init__(self, parameter_name, parameter_type, parameter_location, default_value=None):
+class NullManipulator(SwagManipulator):
+    def __init__(self, parameter_name, parameter_type, parameter_location):
         self.parameter_name = parameter_name
         self.parameter_type = parameter_type
-        self.default_value = default_value
+        self.default_value = "NULL"
         self.parameter_location = parameter_location
         super().__init__()
         self.generate()
@@ -18,6 +18,3 @@ class StringManipulator(SwagManipulator):
 
     def permutate(self, original_value):
         return self.get_rules()
-
-    def get_rules(self):
-        return "STRINGRULE"

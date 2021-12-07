@@ -7,8 +7,7 @@ class IntegerManipulator(SwagManipulator):
         self.parameter_type = parameter_type
         self.default_value = default_value
         self.parameter_location = parameter_location
-        super().__init__(self.parameter_name, self.parameter_type,
-                         self.parameter_location, self.default_value)
+        super().__init__()
         self.generate()
 
     def generate(self):
