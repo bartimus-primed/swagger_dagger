@@ -19,14 +19,11 @@ class SwagEndpoint:
         self.host = host
         self.conn_type = endpoint_addr.split("://")[0]
         self.endpoint_location = "/" + "/".join(endpoint_addr.split("/")[3:])
-        self.endpoint_get = None
-        self.endpoint_post = None
         self.methods = []
         self.debug = debug
         for k, v in raw_json.items():
-            self.endpoint_post = SE_METHOD(
-                self.host, k.upper(), v, self.conn_type, self.endpoint_location, self.debug)
-            self.methods.append(self.endpoint_post)
+            self.methods.append(SE_METHOD(
+                self.host, k.upper(), v, self.conn_type, self.endpoint_location, self.debug))
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, indent=2)
