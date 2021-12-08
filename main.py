@@ -1,5 +1,6 @@
 import argparse
 from swag.swag_manager import SwagManager
+from swag.cli import SD_Shell
 
 
 def main(swagger_endpoint):
@@ -18,10 +19,10 @@ def main(swagger_endpoint):
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(
-        description="Swagger Dagger will attempt to probe API endpoints based on Swagger's json endpoint. You might use swagger to help expose your API, but what do you use to check if your API exposes you?", usage="python main.py http://192.168.1.1/v2/{swagger's json endpoint}")
-    argparser.add_argument("SwaggerEndpoint",
-                           help="Point me to the swagger json endpoint")
-    # argparser.add_argument(
-    #     "-Endpoint", help="If you don't know where the json endpoint is, just give the web address and try to bruteforce it", required=False)
+        description="Swagger Dagger will attempt to probe API endpoints based on Swagger's json endpoint. You might use swagger to help expose your API, but what do you use to check if your API exposes you?",
+        usage="python main.py http://192.168.1.1/v2/{swagger's json endpoint}")
+    argparser.add_argument(
+        "SwaggerEndpoint", help="Point me to the swagger json endpoint")
+
     args = argparser.parse_args()
-    main(args.SwaggerEndpoint)
+    SD_Shell(args.SwaggerEndpoint).cmdloop()

@@ -2,7 +2,7 @@ import json
 import queue
 from urllib.request import urlopen
 from swag.swag_endpoint import SwagEndpoint
-from enum import Enum
+from collections import OrderedDict
 from http.client import HTTPConnection, HTTPSConnection
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -31,15 +31,13 @@ class SwagManager:
         self.tags = None
         self.paths = None
         self.definitions = None
-        self.open_endpoints = []
-        self.endpoints = {}
+        self.endpoints = OrderedDict()
         self.endpoint = endpoint
         self.desired_protocol = self.endpoint.split("://")[0].lower()
         self.debug = debug
-        self.get_swag_endpoint_data()
-        self.parse_swagger_json()
 
     # Read the json endpoint. I need to add a brute force checker for common locations.
+
     def get_swag_endpoint_data(self):
         try:
             with urlopen(self.endpoint, timeout=3) as swag_conn:
@@ -66,6 +64,18 @@ class SwagManager:
             print(resp.geturl())
             if str(resp.status) == "200":
                 print(resp.read().decode("utf8"))
+        self.parse_swagger_json()
+
+    def get_endpoint_count(self):
+        return len(self.endpoints)
+
+    def list_endpoints(self, is_open=False):
+        for idx, e in enumerate(self.endpoints):
+            if is_open:
+                if self.endpoints[e].check_successful():
+                    print(f"{idx}. {e}")
+            else:
+                print(f"{idx}. {e}")
 
     def parse_swagger_json(self):
         for k, v in self.endpoint_data.items():
@@ -102,21 +112,9 @@ class SwagManager:
         for endpoint_name, endpoint in self.endpoints.items():
             endpoint.test_connections()
 
-    def detect_open_endpoints(self):
-        for endpoint_name, endpoint in self.endpoints.items():
-            success = endpoint.check_successful()
-            if success:
-                if self.debug:
-                    print(
-                        f"Endpoint: {endpoint_name} seems to be open\n\tresponse: {success}")
-                self.open_endpoints.append(endpoint)
-
-    def print_open_endpoints(self, only_show_parameters=False):
-        for endpoint in self.open_endpoints:
-            if only_show_parameters:
-                for method in endpoint.methods:
-                    if method.parameters:
-                        for entry in method.parameters:
-                            print(entry)
-            else:
-                print(endpoint)
+    def get_endpoint(self, endpoint_number):
+        for idx, key in enumerate(self.endpoints):
+            if idx == endpoint_number:
+                return self.endpoints[key]
+        else:
+            return False

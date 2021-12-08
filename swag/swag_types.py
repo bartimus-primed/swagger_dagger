@@ -137,6 +137,12 @@ class SE_METHOD:
         for mani in self.manipulators:
             mani.generate()
 
+    def list_parameters(self):
+        list_of_parameters = []
+        for param in self.all_parameters:
+            list_of_parameters.append(param.name)
+        return list_of_parameters
+
 
 class SE_RESPONSE:
     def __init__(self, code, description):

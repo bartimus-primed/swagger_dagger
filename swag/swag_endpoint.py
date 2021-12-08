@@ -35,17 +35,19 @@ class SwagEndpoint:
         for method in self.methods:
             method.test_endpoint_connection()
 
-    def get_parameters(self):
-        for method in self.methods:
-            if method.parameters is not None:
-                if self.debug:
-                    print(method.parameters)
-
     def check_successful(self):
         for method in self.methods:
             if method.successful:
                 return method.successful_response
 
-    def print_open_methods(self, only_show_parameters=False):
+    def list_methods(self):
+        dict_of_methods = {}
         for method in self.methods:
-            print(method)
+            dict_of_methods[method.method] = method.list_parameters()
+        return dict_of_methods
+
+    def get_method(self, method_type):
+        for method in self.methods:
+            if method.method == method_type:
+                return method
+        return False
