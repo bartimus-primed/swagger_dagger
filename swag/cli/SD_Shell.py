@@ -1,86 +1,10 @@
 import cmd
 import os
 from swag.swag_manager import SwagManager
-
+from swag.cli.SD_Endpoint import SD_Endpoint
 CLEAR_COMMAND = "cls"
 if os.name != "nt":
     CLEAR_COMMAND = "clear"
-
-
-class SD_Method(cmd.Cmd):
-    intro = "Interact with a Endpoint's Method"
-
-    def __init__(self, method_item):
-        self.method = method_item.method
-        self.method_item = method_item
-        self.prompt = f"({self.method} {self.method_item.endpoint_location}) "
-        self.intro = self.get_intro()
-        super().__init__()
-        super().cmdloop(self.get_intro())
-
-    def get_intro(self):
-        final_out = f"Interacting with Method: {self.method} {self.method_item.endpoint_location}\n"
-        for parameter in self.method_item.all_parameters:
-            other_string = f"Method Parameter: {parameter.name}\n\tType: {parameter.type_of}\n\tRequired: {parameter.required}\n\tDefault: {parameter.default}\n"
-            final_out += other_string
-        return final_out
-
-    def do_quit(self, args):
-        """Exit"""
-        return True
-
-    def do_exit(self, args):
-        """Exit"""
-        return True
-
-    def emptyline(self) -> bool:
-        os.system(CLEAR_COMMAND)
-        print(self.get_intro())
-
-
-class SD_Endpoint(cmd.Cmd):
-    intro = "Interact with a specific Host Endpoint"
-
-    def __init__(self, endpoint_item):
-        self.endpoint = endpoint_item.endpoint_location
-        self.swag_endpoint = endpoint_item
-        self.prompt = f"({self.endpoint}) "
-        self.intro = self.get_intro()
-        super().__init__()
-        super().cmdloop(self.get_intro())
-
-    def get_intro(self):
-        final_out = f"Interacting with: {self.endpoint}\n"
-        methods = self.swag_endpoint.list_methods()
-        for k, v in methods.items():
-            other_string = f"Supported Method: {k}\n"
-            for param in v:
-                other_string += f"\tParameter Name: {param}\n"
-            final_out += other_string
-        return final_out
-
-    def do_quit(self, args):
-        """Exit"""
-        return True
-
-    def do_exit(self, args):
-        """Exit"""
-        return True
-
-    def do_select(self, args):
-        """
-        Select a method to interact with it.
-        """
-        method_item = self.swag_endpoint.get_method(args.upper())
-        if not method_item:
-            print("Invalid method selected")
-            return
-        SD_Method(method_item)
-        self.lastcmd = ""
-
-    def emptyline(self) -> bool:
-        os.system(CLEAR_COMMAND)
-        print(self.get_intro())
 
 
 class SD_Shell(cmd.Cmd):

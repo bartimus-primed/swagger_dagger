@@ -50,3 +50,6 @@ class SwagManipulator(ABC):
 
     def __str__(self):
         return self.toJson()
+
+    def get_name(self):
+        return self.__class__.__name__

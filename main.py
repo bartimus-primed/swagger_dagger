@@ -1,20 +1,9 @@
 import argparse
-from swag.swag_manager import SwagManager
-from swag.cli import SD_Shell
+from swag.cli.SD_Shell import SD_Shell
 
 
 def main(swagger_endpoint):
-    swag_api = SwagManager(swagger_endpoint)
-    swag_api.test_connections()
-    swag_api.detect_open_endpoints()
-    for _e in swag_api.endpoints:
-        for meth in swag_api.endpoints[_e].methods:
-            if meth.all_parameters:
-                meth.generate_parameter_url()
-            if meth.fuzzed_endpoint_location is not None:
-                meth.test_fuzzed_endpoint_connection(print_response=True)
-                if meth.successful_response:
-                    print(meth.successful_response)
+    SD_Shell(swagger_endpoint).cmdloop()
 
 
 if __name__ == "__main__":
@@ -25,4 +14,4 @@ if __name__ == "__main__":
         "SwaggerEndpoint", help="Point me to the swagger json endpoint")
 
     args = argparser.parse_args()
-    SD_Shell(args.SwaggerEndpoint).cmdloop()
+    main(args.SwaggerEndpoint)

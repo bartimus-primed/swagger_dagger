@@ -143,6 +143,11 @@ class SE_METHOD:
             list_of_parameters.append(param.name)
         return list_of_parameters
 
+    def get_parameter(self, parameter_number):
+        if parameter_number < len(self.all_parameters):
+            return self.all_parameters[parameter_number]
+        return False
+
 
 class SE_RESPONSE:
     def __init__(self, code, description):
@@ -218,3 +223,6 @@ class SE_PARAMETER:
                 else:
                     self.manipulator = NullManipulator(
                         self.name, self.type_of, self.location)
+
+    def describe(self):
+        return f"\tlocation: {self.location}\n\tdescription: {self.description}\n\trequired: {self.required}\n\tdefault value: {self.default}\n\tformat: {self.format}\n\ttype: {self.type_of}\n\tassigned manipulators: {self.manipulator.get_name()}\n"
