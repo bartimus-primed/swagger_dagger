@@ -49,7 +49,7 @@ class SE_METHOD:
                     for sub_k, sub_v in v.items():
                         if sub_v["description"] is not None:
                             self.responses[sub_k] = SE_RESPONSE(
-                                sub_k, sub_v["description"])
+                                sub_k, sub_v)
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, indent=2)

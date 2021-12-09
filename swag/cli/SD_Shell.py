@@ -94,6 +94,11 @@ class SD_Shell(cmd.Cmd):
         After listing the endpoints, select an endpoint to interact with
         select ENDPOINT_NUMBER
         """
+        try:
+            int(args)
+        except:
+            print("should be a number... e.g. select 0")
+            return
         if not args:
             print("You kind of need to select something...")
             return

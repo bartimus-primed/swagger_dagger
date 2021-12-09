@@ -19,15 +19,23 @@ class SD_Method(cmd.Cmd):
         super().cmdloop(self.get_intro())
 
     def get_intro(self):
-        final_out = f"Interacting with Method: {self.method} {self.method_item.endpoint_location}\n"
+        final_out = f"Interacting with Method: {self.method} {self.method_item.endpoint_location}\n=== Parameters ===\n"
         for idx, parameter in enumerate(self.method_item.all_parameters):
             final_out += f"{idx}. Method Parameter: {parameter.name}\n\tType: {parameter.type_of}\n\tRequired: {parameter.required}\n\tDefault: {parameter.default}\n"
+        final_out += "=== Responses ===\n"
+        for k, v in self.method_item.responses.items():
+            final_out += f"{k}: {v}\n"
         return final_out
 
     def do_select(self, args):
         """
         Select a Parameter to interact with it.
         """
+        try:
+            int(args)
+        except:
+            print("should be a number... e.g. select 0")
+            return
         parameter_item = self.method_item.get_parameter(int(args))
         if not parameter_item:
             print("Invalid parameter selected")
