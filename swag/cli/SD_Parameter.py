@@ -15,6 +15,7 @@ class SD_Parameter(cmd.Cmd):
         self.prompt = f"({self.parameter} {self.endpoint_name}) "
         self.intro = self.get_intro()
         super().__init__()
+        os.system(CLEAR_COMMAND)
         super().cmdloop(self.get_intro())
 
     def get_intro(self):

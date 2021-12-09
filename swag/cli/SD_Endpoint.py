@@ -15,6 +15,7 @@ class SD_Endpoint(cmd.Cmd):
         self.prompt = f"({self.endpoint}) "
         self.intro = self.get_intro()
         super().__init__()
+        os.system(CLEAR_COMMAND)
         super().cmdloop(self.get_intro())
 
     def get_intro(self):
@@ -39,6 +40,9 @@ class SD_Endpoint(cmd.Cmd):
         """
         Select a method to interact with it.
         """
+        if not args:
+            print("You kind of need to select something...")
+            return
         method_item = self.swag_endpoint.get_method(args.upper())
         if not method_item:
             print("Invalid method selected")

@@ -78,19 +78,25 @@ class SD_Shell(cmd.Cmd):
             answer = input(
                 f"You are about to check connectivity to {self.swag_manager.get_endpoint_count()} endpoints... press y to continue. ")
             if not answer.__contains__("y"):
+                self.emptyline()
                 return
             self.swag_manager.test_connections()
             self.endpoints_queried = True
-        open_items = False
+        self.emptyline()
         if args.__contains__("open"):
-            open_items = True
-        self.swag_manager.list_endpoints(open_items)
+            print("Open Endpoints:")
+            self.swag_manager.list_endpoints(True)
+            return
+        self.swag_manager.list_endpoints()
 
     def do_select(self, args):
         """
         After listing the endpoints, select an endpoint to interact with
         select ENDPOINT_NUMBER
         """
+        if not args:
+            print("You kind of need to select something...")
+            return
         ep_item = self.swag_manager.get_endpoint(int(args))
         if not ep_item:
             print("Invalid Endpoint number selected")

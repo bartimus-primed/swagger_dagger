@@ -15,6 +15,7 @@ class SD_Method(cmd.Cmd):
         self.prompt = f"({self.method} {self.method_item.endpoint_location}) "
         self.intro = self.get_intro()
         super().__init__()
+        os.system(CLEAR_COMMAND)
         super().cmdloop(self.get_intro())
 
     def get_intro(self):
@@ -34,6 +35,22 @@ class SD_Method(cmd.Cmd):
         SD_Parameter(parameter_item,
                      f"{self.method} {self.method_item.endpoint_location}")
         self.lastcmd = ""
+
+    def do_fuzz(self, args):
+        answer = input(
+            f"You are about to fuzz {self.method_item.endpoint_location}, this is considered malicious... press y to continue. ")
+        if not answer.__contains__("y"):
+            self.emptyline()
+            return
+        self.method_item.test_endpoint_connection(True, True)
+
+    def do_connect(self, args):
+        answer = input(
+            f"You are about to check connectivity to {self.method_item.endpoint_location}... press y to continue. ")
+        if not answer.__contains__("y"):
+            self.emptyline()
+            return
+        self.method_item.test_endpoint_connection(True)
 
     def do_quit(self, args):
         """Exit"""

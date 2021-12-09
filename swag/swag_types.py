@@ -29,6 +29,7 @@ class SE_METHOD:
         self.responses = {}
         self.successful = False
         self.successful_response = False
+        self.last_response = False
         self.debug = debug
         self.build_data(raw_json)
 
@@ -56,8 +57,12 @@ class SE_METHOD:
     def __str__(self):
         return self.toJson()
 
-    def test_endpoint_connection(self):
+    def test_endpoint_connection(self, print_response=False, fuzzed=False):
         connection = None
+        if fuzzed and print_response:
+            self.generate_parameter_url()
+            print(
+                f"Fuzzing {self.method} request {self.endpoint_location} with these parameters: {self.fuzzed_endpoint_location}")
         match(self.conn_type.lower()):
             case "http":
                 connection = HTTPConnection(self.host, timeout=1)
@@ -65,49 +70,35 @@ class SE_METHOD:
                 connection = HTTPSConnection(self.host, timeout=1)
             case _:
                 if self.debug:
-                    print("unsupported method. (for right now)")
+                    print("unsupported protocol. (for right now)")
                 return
         if connection is not None:
-            connection.request(
-                self.method, self.endpoint_location)
+            if fuzzed:
+                connection.request(self.method, self.fuzzed_endpoint_location)
+            else:
+                connection.request(self.method, self.endpoint_location)
             resp = connection.getresponse()
-            if str(resp.status) == "200":
+            resp_status = str(resp.status)
+            if print_response:
+                print(f"Response Code: {resp_status}")
+            if resp_status == "200":
                 self.successful = True
                 try:
                     self.successful_response = json.loads(
                         resp.read().decode("utf8").replace("'", '"'))
                 except:
                     self.successful_response = resp.read().decode("utf8")
-            connection.close()
-
-    def test_fuzzed_endpoint_connection(self, print_response=False):
-        if print_response:
-            print(
-                f"Fuzzing {self.method} request {self.endpoint_location} with these parameters: {self.fuzzed_endpoint_location}")
-        connection = None
-        match(self.conn_type.lower()):
-            case "http":
-                connection = HTTPConnection(self.host, timeout=1)
-            case "https":
-                connection = HTTPSConnection(self.host, timeout=1)
-            case _:
-                if self.debug:
-                    print("unsupported method. (for right now)")
-                return
-        if connection is not None:
-            connection.request(
-                self.method, self.fuzzed_endpoint_location)
-            resp = connection.getresponse()
-            match(str(resp.status)):
-                case "200":
-                    self.successful = True
-                    try:
-                        self.successful_response = json.loads(
-                            resp.read().decode("utf8").replace("'", '"'))
-                    except:
-                        self.successful_response = resp.read().decode("utf8")
-                case "500":
-                    print("ERROR from server")
+                self.last_response = self.successful_response
+                if print_response:
+                    print(self.successful_response)
+            else:
+                try:
+                    self.last_response = json.loads(
+                        resp.read().decode("utf8").replace("'", '"'))
+                except:
+                    self.last_response = resp.read().decode("utf8")
+                if print_response:
+                    print(self.last_response)
             connection.close()
 
     def generate_parameter_url(self):
