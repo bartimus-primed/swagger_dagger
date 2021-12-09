@@ -11,8 +11,8 @@
 - Attempting to use this in versions <3.10 will likely fail due to multiple uses of the match statement
 
 #### Background
-My last project needed to test a couple hundred API endpoints for Access Permissions.
-After spending a few hours looking through the source code and gathering the parameters for each endpoint, I realized this was going to take too long. 
+My last project needed to test a couple hundred API endpoints for Access Permissions. After spending a few hours looking through the source code and gathering 
+the parameters for each endpoint, I realized this was going to take too long. 
 I found a Swagger json endpoint (awesome tool for devs, even more awesome for security researchers :D).
 
 Swagger Dagger was born.
