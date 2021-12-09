@@ -25,4 +25,5 @@ Work In Progress
 2. Identify API http methods (done)
 3. Identify API http parameters (done)
 4. Interact with the APIs to identify which do not require authentication (done)
-5. Fuzz the available parameters (in progress)
+5. Diverted some time to make an interactive command prompt. (done)
+6. Fuzz the available parameters (in progress)
