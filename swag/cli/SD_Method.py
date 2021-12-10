@@ -24,7 +24,7 @@ class SD_Method(cmd.Cmd):
             final_out += f"{idx}. Method Parameter: {parameter.name}\n\tType: {parameter.type_of}\n\tRequired: {parameter.required}\n\tDefault: {parameter.default}\n"
         final_out += "=== Responses ===\n"
         for k, v in self.method_item.responses.items():
-            final_out += f"{k}: {v}\n"
+            final_out += f"{v.code}: {v.description}\n"
         return final_out
 
     def do_select(self, args):
@@ -52,7 +52,7 @@ class SD_Method(cmd.Cmd):
             return
         self.method_item.test_endpoint_connection(True, True)
 
-    def do_connect(self, args):
+    def do_query(self, args):
         answer = input(
             f"You are about to check connectivity to {self.method_item.endpoint_location}... press y to continue. ")
         if not answer.__contains__("y"):

@@ -79,9 +79,13 @@ class SE_METHOD:
                 connection.request(self.method, self.endpoint_location)
             resp = connection.getresponse()
             resp_status = str(resp.status)
+            if resp.getheader("content-type") is not None:
+                resp_content_type = resp.getheader("content-type").strip()
+            else:
+                resp_content_type = ""
             if print_response:
                 print(f"Response Code: {resp_status}")
-            if resp_status == "200":
+            if resp_status == "200" or resp_content_type == "application/json":
                 self.successful = True
                 try:
                     self.successful_response = json.loads(
